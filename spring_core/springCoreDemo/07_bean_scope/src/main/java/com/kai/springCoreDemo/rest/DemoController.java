@@ -10,16 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class DemoController {
     // define a private field for the dependencies
     private Coach myCoach;
-    private Coach anotherCoach;
 
     @Autowired
     public DemoController(
-            // Default scope is singleton, all dependency injections for the bean will reference the same bean
-            @Qualifier("cricketCoach") Coach theCoach, @Qualifier("cricketCoach") Coach theOtherCoach
+            @Qualifier("cricketCoach") Coach theCoach
     ) {
         System.out.println("In constructor " + getClass().getSimpleName());
         myCoach = theCoach;
-        anotherCoach = theOtherCoach;
     }
 
     @GetMapping("/dailyworkout")
@@ -27,8 +24,4 @@ public class DemoController {
         return myCoach.getDailyWorkout();
     }
 
-    @GetMapping("/check")
-    public String check() {
-        return "Comparing beans : myCoach == anotherCoach, " + (myCoach == anotherCoach);
-    }
 }
