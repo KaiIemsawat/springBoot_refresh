@@ -2,10 +2,9 @@ package com.kai.springboot_rest_crud.rest;
 
 import com.kai.springboot_rest_crud.entity.Student;
 import jakarta.annotation.PostConstruct;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +33,33 @@ public class StudentController {
     @GetMapping("/students/{studentId}") // '{this}' <-- needs to match with the '@PathVariable
     public Student getStudentById(@PathVariable int studentId) {
 
-        // Index into the list
+        if (studentId >= students.size() || studentId < 0) {
+            throw new StudentNotFoundException("No student with this ID found");
+        }
+
         return students.get(studentId);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException (StudentNotFoundException se) {
+
+        // Create an ErrorResponse
+        ErrorResponse error = new ErrorResponse();
+        error.setStatus(HttpStatus.NOT_FOUND.value());
+        error.setMessage(se.getMessage());
+        error.setTimestamp(System.currentTimeMillis());
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+
+        ErrorResponse error = new ErrorResponse();
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setMessage(e.getMessage());
+        error.setTimestamp(System.currentTimeMillis());
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 }
